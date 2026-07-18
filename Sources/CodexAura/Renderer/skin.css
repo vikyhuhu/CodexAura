@@ -1,0 +1,285 @@
+/* CodexAura skin v3 — full theme recipe.
+   Strategy: completely re-skin Codex with the theme palette (backgrounds,
+   text, icons, borders) instead of only making panels translucent. Panels
+   stay fairly opaque so every region keeps a clear boundary; the wallpaper
+   shows crisply in the gaps. Works the same in light and dark appearance
+   because we override the app's own design tokens everywhere. */
+
+/* ---------- Wallpaper layer (crisp, no wash-out) ---------- */
+
+html.codex-aura body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--aura-image);
+  background-size: cover;
+  background-position: var(--aura-focus, 50% 50%);
+  filter: blur(var(--aura-blur, 0px));
+  pointer-events: none;
+}
+
+/* Gentle dim only — readability comes from the opaque panels, not the scrim. */
+html.codex-aura body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgb(var(--aura-bg-rgb, 16 18 22) / var(--aura-dim, 0.25));
+  pointer-events: none;
+}
+
+html.codex-aura body { background: transparent !important; }
+html.codex-aura body > div { position: relative; z-index: 1; }
+
+/* ---------- Full token override ---------- */
+
+html.codex-aura {
+  /* Surfaces: wallpaper must read as ONE continuous painting across the
+     window — panels stay translucent enough for the art to bleed through,
+     readability comes from heavy backdrop blur, not from opacity. */
+  --color-background-surface: rgb(var(--aura-bg-rgb) / 0.30) !important;
+  --color-background-surface-under: transparent !important;
+  --color-background-panel: rgb(var(--aura-bg-rgb) / 0.42) !important;
+  --color-background-elevated-primary: rgb(var(--aura-panel-rgb) / 0.72) !important;
+  --color-background-elevated-secondary: rgb(var(--aura-panel-rgb) / 0.80) !important;
+  --color-background-control: rgb(var(--aura-panel-rgb) / 0.72) !important;
+  --color-background-control-opaque: rgb(var(--aura-panel-rgb)) !important;
+  --color-background-editor-opaque: rgb(var(--aura-bg-rgb)) !important;
+
+  /* Text + icons: theme colors so the look holds in any appearance. */
+  --color-text-foreground: var(--aura-text) !important;
+  --color-text-foreground-secondary: var(--aura-muted) !important;
+  --color-text-foreground-tertiary: var(--aura-muted) !important;
+  --color-icon-primary: var(--aura-text) !important;
+  --color-icon-secondary: var(--aura-muted) !important;
+  --color-icon-tertiary: var(--aura-muted) !important;
+
+  /* Borders: always visible so regions read as distinct cards. */
+  --color-border: var(--aura-line) !important;
+  --color-border-heavy: rgb(var(--aura-accent-rgb) / 0.28) !important;
+  --color-border-light: var(--aura-line) !important;
+  --color-border-focus: var(--aura-accent) !important;
+
+  /* Accent */
+  --color-accent-blue: var(--aura-accent) !important;
+  --color-accent-purple: var(--aura-accent) !important;
+  --color-text-accent: var(--aura-accent) !important;
+  --color-icon-accent: var(--aura-accent) !important;
+  --color-background-accent: rgb(var(--aura-accent-rgb) / 0.16) !important;
+  --color-background-accent-hover: rgb(var(--aura-accent-rgb) / 0.22) !important;
+  --color-background-accent-active: rgb(var(--aura-accent-rgb) / 0.28) !important;
+
+  /* Buttons */
+  --color-background-button-primary: var(--aura-accent) !important;
+  --color-text-button-primary: rgb(var(--aura-bg-rgb)) !important;
+  --color-background-button-secondary: rgb(var(--aura-accent-rgb) / 0.14) !important;
+  --color-text-button-secondary: var(--aura-text) !important;
+  --color-text-button-tertiary: var(--aura-muted) !important;
+
+  color-scheme: dark;
+}
+
+/* ---------- Structure: frosted panels with clear edges ---------- */
+
+html.codex-aura aside.app-shell-left-panel,
+html.codex-aura aside[class*="left-panel"] {
+  /* One continuous painting: same tint as the main area's left edge so the
+     sidebar and content read as a single surface. No blur (its edge fringe
+     reads as a seam), no border in borderless mode. */
+  background: rgb(var(--aura-bg-rgb) / 0.42) !important;
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+html.codex-aura main.main-surface {
+  background: transparent !important;
+  /* App draws a 0.5px ring + drop shadows here — visible as a hairline seam
+     against the wallpaper. */
+  box-shadow: none !important;
+}
+
+/* The main content frame's top hairline uses border-heavy — with an accent
+   override it reads as a loud colored line across the top. Kill it. */
+html.codex-aura .app-shell-main-content-frame {
+  border-color: transparent !important;
+}
+
+/* The sidebar's resize-handle strip hangs 20px into the main area with a
+   dark tint — keep the hit zone but make it invisible. */
+html.codex-aura aside.app-shell-left-panel::after,
+html.codex-aura aside[class*="left-panel"]::after {
+  background: transparent !important;
+}
+
+/* Conversation text zone gets a soft left-to-right shade so text stays
+   readable over busy parts of the wallpaper while the art stays visible. */
+html.codex-aura main.main-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg,
+    rgb(var(--aura-bg-rgb) / 0.42) 0%,
+    rgb(var(--aura-bg-rgb) / 0.22) 55%,
+    rgb(var(--aura-bg-rgb) / 0.06) 100%);
+  pointer-events: none;
+}
+
+/* 对话页（有 markdown 正文时）加强蒙版：文字区更暗更聚焦，右侧画面仍透出。 */
+html.codex-aura main.main-surface:has([class*="_markdownContent"])::before {
+  background: linear-gradient(90deg,
+    rgb(var(--aura-bg-rgb) / 0.66) 0%,
+    rgb(var(--aura-bg-rgb) / 0.58) 45%,
+    rgb(var(--aura-bg-rgb) / 0.40) 75%,
+    rgb(var(--aura-bg-rgb) / 0.22) 100%);
+}
+
+/* ---------- 主题色渗透 ---------- */
+
+/* 品牌字 */
+html.codex-aura aside .font-openai-sans.font-semibold {
+  color: var(--aura-accent) !important;
+}
+
+/* 选中的会话项：主题色描边 + 底色 */
+html.codex-aura aside [data-app-action-sidebar-thread-active="true"] {
+  background: rgb(var(--aura-accent-rgb) / 0.14) !important;
+  box-shadow: inset 0 0 0 1px rgb(var(--aura-accent-rgb) / 0.35) !important;
+}
+
+/* 当前项目行（aria-current="page"）：同一套主题色高亮 */
+html.codex-aura aside [data-app-action-sidebar-project-row][aria-current="page"] {
+  background: rgb(var(--aura-accent-rgb) / 0.14) !important;
+  box-shadow: inset 0 0 0 1px rgb(var(--aura-accent-rgb) / 0.35) !important;
+}
+
+/* 首页建议卡图标：统一为主题色（官方给每个图标配了不同语义色） */
+html.codex-aura [class*="home-suggestions"] svg {
+  color: var(--aura-accent) !important;
+}
+
+/* 发送按钮：主题色实心 */
+html.codex-aura .composer-surface-chrome button[class*="size-token-button"],
+html.codex-aura [class*="composer-surface"] button[class*="size-token-button"] {
+  background: var(--aura-accent) !important;
+  color: rgb(var(--aura-bg-rgb)) !important;
+}
+
+/* 项目选择 pill */
+html.codex-aura [class*="project-selector"] {
+  background: rgb(var(--aura-accent-rgb) / 0.14) !important;
+  box-shadow: inset 0 0 0 1px rgb(var(--aura-accent-rgb) / 0.30) !important;
+}
+
+/* 行内代码片（不碰代码块） */
+html.codex-aura main :not(pre) > code {
+  background: rgb(var(--aura-accent-rgb) / 0.13);
+  color: var(--aura-text);
+  border-radius: 5px;
+  padding: 0.05em 0.35em;
+}
+
+/* Composer: solid float with a real border, like a card. */
+html.codex-aura .composer-surface-chrome,
+html.codex-aura [class*="composer-surface"] {
+  background: rgb(var(--aura-panel-rgb) / 0.9) !important;
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid var(--aura-line) !important;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.35) !important;
+}
+
+/* Scrollbars and selection follow the accent. */
+html.codex-aura ::selection {
+  background: rgb(var(--aura-accent-rgb) / 0.35);
+}
+
+/* 去掉 app 自带的装饰性分隔线：主区顶部的渐变 fade（会被主题色染成暗带）、
+   侧栏底部用户行上方的 0.5px 分隔线。 */
+html.codex-aura .app-shell-main-content-top-fade {
+  background-image: none !important;
+}
+html.codex-aura aside.app-shell-left-panel [class*="h-[0.5px]"] {
+  background: transparent !important;
+}
+
+/* ---------- 首页（home）布局：宽列 + 左对齐 + 卡片样式 ---------- */
+
+/* 内容列加宽 48rem -> 68rem（输入框用同一变量，自动跟随对齐）。
+   变量定义在 body 上层级，故覆盖也写在 body 上并限定首页路由。 */
+html.codex-aura body:has([class*="home-suggestions"]) {
+  --thread-content-max-width: 68rem;
+}
+
+/* 大标题左对齐并适度上移（含上方 Logo 图标） */
+html.codex-aura main div:has(> .heading-xl) {
+  align-items: flex-start !important;
+  transform: translateY(-80px);
+}
+html.codex-aura main .heading-xl {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+/* 标题下方的用户签名行（内容来自 --aura-tagline，可在菜单栏编辑；空则不显示）。
+   负 margin 抵消父容器 24px 的 flex gap，让签名贴近标题。 */
+html.codex-aura main div:has(> .heading-xl)::after {
+  content: var(--aura-tagline, "");
+  color: var(--aura-muted);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  margin-top: -14px;
+  order: 99;
+}
+
+/* 标题上方的 Logo 图标 → 主题色 */
+html.codex-aura main.main-surface [class*="size-14"] svg {
+  color: var(--aura-accent) !important;
+}
+
+/* 标题里的项目 pill → 主题色高亮框（与侧栏选中态同一语言），留出呼吸空间 */
+html.codex-aura main .heading-xl button {
+  background: rgb(var(--aura-accent-rgb) / 0.14) !important;
+  box-shadow: inset 0 0 0 1px rgb(var(--aura-accent-rgb) / 0.35) !important;
+  border-radius: 8px !important;
+  padding: 2px 10px !important;
+  margin: 0 2px !important;
+}
+
+/* 建议卡：整体下移、文字单行、内容居中、图标坐进半透明圈 */
+html.codex-aura [class*="home-suggestions"] {
+  transform: translateY(48px);
+}
+html.codex-aura [class*="home-suggestions"] button {
+  white-space: nowrap !important;
+}
+html.codex-aura [class*="home-suggestions"] button > span:first-child,
+html.codex-aura [class*="home-suggestions"] button > span:last-child {
+  justify-content: center !important;
+  text-align: center !important;
+}
+html.codex-aura [class*="home-suggestions"] button [class*="size-6"]:has(svg) {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 9999px !important;
+  background: rgb(var(--aura-accent-rgb) / 0.16) !important;
+  box-shadow: inset 0 0 0 1px rgb(var(--aura-accent-rgb) / 0.25) !important;
+  justify-content: center !important;
+}
+
+/* ---------- Bordered mode（菜单栏「边界线」开关打开时） ---------- */
+
+html.codex-aura.aura-bordered {
+  --color-background-panel: rgb(var(--aura-panel-rgb) / 0.68) !important;
+  --color-background-elevated-primary: rgb(var(--aura-panel-rgb) / 0.80) !important;
+  --color-background-elevated-secondary: rgb(var(--aura-panel-rgb) / 0.86) !important;
+  --color-background-control: rgb(var(--aura-panel-rgb) / 0.80) !important;
+  --color-border-heavy: rgb(var(--aura-accent-rgb) / 0.40) !important;
+}
+
+html.codex-aura.aura-bordered aside.app-shell-left-panel,
+html.codex-aura.aura-bordered aside[class*="left-panel"] {
+  background: rgb(var(--aura-panel-rgb) / 0.68) !important;
+  border-right: 1px solid var(--aura-line) !important;
+}
