@@ -207,8 +207,9 @@ html.codex-aura aside.app-shell-left-panel [class*="h-[0.5px]"] {
 /* ---------- 首页（home）布局：宽列 + 左对齐 + 卡片样式 ---------- */
 
 /* 内容列加宽 48rem -> 68rem（输入框用同一变量，自动跟随对齐）。
-   变量定义在 body 上层级，故覆盖也写在 body 上并限定首页路由。 */
-html.codex-aura body:has([class*="home-suggestions"]) {
+   锚点用 .heading-xl 而不是 home-suggestions：输入文字后建议卡会被 Codex
+   移除，但标题仍在，宽列才不会在输入时弹回 48rem。 */
+html.codex-aura body:has(main .heading-xl) {
   --thread-content-max-width: 68rem;
 }
 
