@@ -1,4 +1,5 @@
 import SwiftUI
+import CodexAuraCore
 
 struct MenuContentView: View {
     @EnvironmentObject private var model: AppModel
@@ -72,7 +73,9 @@ struct MenuContentView: View {
                             .onTapGesture { Task { await model.apply(theme) } }
                             .contextMenu {
                                 Button("导出主题包…") { model.exportPack(theme) }
-                                Button("删除", role: .destructive) { model.deleteTheme(theme) }
+                                if !theme.isBundledPreset {
+                                    Button("删除", role: .destructive) { model.deleteTheme(theme) }
+                                }
                             }
                     }
                 }

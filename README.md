@@ -55,6 +55,8 @@ open build/CodexAura.app
 
 > 换肤期间请让 CodexAura 常驻菜单栏（它是注入保活进程）；退出 App 后，当前主题保留到 Codex 下次刷新或重启。
 
+内置预设包含「剪纸山海守夜人」「发财程序员」「星光小队长」「千禧信使」「元气食堂」。内置预设会随版本升级，不能删除；仍可导出分享，暗角和模糊微调也会在升级时保留。
+
 ## CLI（调试 / 自动化）
 
 ```bash
@@ -75,16 +77,29 @@ CodexAura --cli import-presets         # 导入 Dream Skin 预设
 ```json
 {
   "schemaVersion": 1,
+  "revision": 1,
   "id": "my-theme",
   "name": "我的主题",
   "image": "background.jpg",
+  "appearance": "auto",
   "colors": { "background": "#101216", "panel": "#171a20", "accent": "#7aa2f7",
-              "text": "#eceef2", "muted": "#a2a8b0", "line": "rgba(255,255,255,.14)" },
+              "text": "#eceef2", "muted": "#a2a8b0", "line": "rgba(255,255,255,.14)",
+              "onAccent": "#000000" },
   "dim": 0.35, "blur": 0, "focusX": 0.5, "focusY": 0.45
 }
 ```
 
-兼容读取 Dream Skin 的 preset 包（缺 `colors` 时自动从图片提取）。
+`appearance` 可设为 `auto`、`light` 或 `dark`；省略时自动根据背景色选择控件外观和遮罩方向。`onAccent` 省略时会在黑白之间自动选择对比度更高的按钮文字色。旧主题无需迁移，缺少这些字段时仍按兼容默认值读取。
+
+兼容读取 Dream Skin 的 preset 包（缺 `colors` 时自动从图片提取）。内置预设的生图构图规范见 [docs/preset-image-prompts.md](docs/preset-image-prompts.md)。
+
+## 测试
+
+```bash
+./Scripts/test.sh
+```
+
+单元测试覆盖旧主题兼容、明暗主题推导、强调色文字对比度、内置预设安装/升级/幂等、删除保护，以及全部内置图片的尺寸和体积约束。
 
 ## 已知边界
 

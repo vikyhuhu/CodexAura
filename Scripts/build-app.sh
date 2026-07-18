@@ -7,8 +7,8 @@ cd "$(dirname "$0")/.."
 APP_DIR="${1:-build/CodexAura.app}"
 
 echo "==> swift build (release, arm64 + x86_64)"
-swift build -c release --arch arm64
-swift build -c release --arch x86_64
+swift build -c release --product CodexAura --arch arm64
+swift build -c release --product CodexAura --arch x86_64
 
 ARM_BIN=".build/arm64-apple-macosx/release/CodexAura"
 X86_BIN=".build/x86_64-apple-macosx/release/CodexAura"
@@ -21,11 +21,15 @@ mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 lipo -create "$ARM_BIN" "$X86_BIN" -output "$APP_DIR/Contents/MacOS/CodexAura"
 cp Scripts/Info.plist "$APP_DIR/Contents/Info.plist"
 
-# SwiftPM resource bundle (payload.js / skin.css) — arch-independent.
-BUNDLE=".build/arm64-apple-macosx/release/CodexAura_CodexAura.bundle"
-if [ -d "$BUNDLE" ]; then
-  cp -R "$BUNDLE" "$APP_DIR/Contents/Resources/"
-fi
+# SwiftPM resource bundles (renderer + bundled presets) — arch-independent.
+for BUNDLE in \
+  ".build/arm64-apple-macosx/release/CodexAura_CodexAura.bundle" \
+  ".build/arm64-apple-macosx/release/CodexAura_CodexAuraCore.bundle"
+do
+  if [ -d "$BUNDLE" ]; then
+    cp -R "$BUNDLE" "$APP_DIR/Contents/Resources/"
+  fi
+done
 
 echo "==> ad-hoc codesign"
 codesign --force --sign - --timestamp=none "$APP_DIR"

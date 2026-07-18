@@ -1,4 +1,5 @@
 import Foundation
+import CodexAuraCore
 
 enum PayloadBuilder {
     private static let maxArtBytes = 16 * 1024 * 1024
@@ -43,6 +44,7 @@ enum PayloadBuilder {
 
         let template = try rendererSource(named: "payload.js")
         let css = try rendererSource(named: "skin.css")
+        let presentation = ThemePresentation.resolve(theme)
         let themeDict: [String: Any] = [
             "id": theme.id,
             "name": theme.name,
@@ -50,6 +52,8 @@ enum PayloadBuilder {
             "blur": theme.blur,
             "focusX": theme.focusX,
             "focusY": theme.focusY,
+            "colorScheme": presentation.colorScheme,
+            "scrimRGB": presentation.scrimRGB,
             "bordered": AuraSettings.load().bordered,
             "tagline": AuraSettings.load().tagline,
             "colors": [
@@ -59,6 +63,7 @@ enum PayloadBuilder {
                 "text": try sanitizedColor(theme.colors.text),
                 "muted": try sanitizedColor(theme.colors.muted),
                 "line": try sanitizedColor(theme.colors.line),
+                "onAccent": try sanitizedColor(presentation.onAccent),
             ],
         ]
         return template

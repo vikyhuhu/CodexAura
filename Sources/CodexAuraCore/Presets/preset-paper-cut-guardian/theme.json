@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-paper-cut-guardian",
+  "name": "剪纸山海守夜人",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#10142b",
+    "panel": "#1a1f3d",
+    "accent": "#f0a53a",
+    "text": "#f2ecdf",
+    "muted": "#9aa0c0",
+    "line": "rgba(240,165,58,.26)",
+    "onAccent": "#10142b"
+  },
+  "dim": 0.28,
+  "blur": 0,
+  "focusX": 0.76,
+  "focusY": 0.48
+}

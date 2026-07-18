@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import CodexAuraCore
 
 /// Headless commands: `CodexAura --cli <command>`. Used for development and
 /// debugging without touching the menu bar app.

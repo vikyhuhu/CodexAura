@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-starlight-captain",
+  "name": "星光小队长",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#07152f",
+    "panel": "#14284d",
+    "accent": "#46d9ff",
+    "text": "#eaf4ff",
+    "muted": "#8fa5c8",
+    "line": "rgba(70,217,255,.28)",
+    "onAccent": "#07152f"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "focusX": 0.75,
+  "focusY": 0.48
+}

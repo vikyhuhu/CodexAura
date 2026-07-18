@@ -25,7 +25,7 @@ html.codex-aura body::after {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: rgb(var(--aura-bg-rgb, 16 18 22) / var(--aura-dim, 0.25));
+  background: rgb(var(--aura-scrim-rgb, 0 0 0) / var(--aura-dim, 0.25));
   pointer-events: none;
 }
 
@@ -72,12 +72,12 @@ html.codex-aura {
 
   /* Buttons */
   --color-background-button-primary: var(--aura-accent) !important;
-  --color-text-button-primary: rgb(var(--aura-bg-rgb)) !important;
+  --color-text-button-primary: var(--aura-on-accent) !important;
   --color-background-button-secondary: rgb(var(--aura-accent-rgb) / 0.14) !important;
   --color-text-button-secondary: var(--aura-text) !important;
   --color-text-button-tertiary: var(--aura-muted) !important;
 
-  color-scheme: dark;
+  color-scheme: var(--aura-color-scheme, dark);
 }
 
 /* ---------- Structure: frosted panels with clear edges ---------- */
@@ -163,7 +163,7 @@ html.codex-aura [class*="home-suggestions"] svg {
 html.codex-aura .composer-surface-chrome button[class*="size-token-button"],
 html.codex-aura [class*="composer-surface"] button[class*="size-token-button"] {
   background: var(--aura-accent) !important;
-  color: rgb(var(--aura-bg-rgb)) !important;
+  color: var(--aura-on-accent) !important;
 }
 
 /* 项目选择 pill */
