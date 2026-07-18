@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import CodexAuraCore
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -61,6 +62,7 @@ final class AppModel: ObservableObject {
 
     init() {
         ThemeLibrary.shared.seedBuiltInPresets()
+        _ = try? BundledPresetCatalog().install(into: ThemeLibrary.shared)
         reloadThemes()
         Task { await refresh() }
     }
@@ -233,7 +235,12 @@ final class AppModel: ObservableObject {
             return
         }
         let wasActive = activeThemeID == theme.id
-        try? ThemeLibrary.shared.delete(theme)
+        do {
+            try ThemeLibrary.shared.delete(theme)
+        } catch {
+            statusLine = error.localizedDescription
+            return
+        }
         reloadThemes()
         // Deleting the active theme must also pull it off the pages — otherwise
         // the watcher keeps injecting a theme that no longer exists on disk.

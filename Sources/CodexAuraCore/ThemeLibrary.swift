@@ -2,18 +2,18 @@ import Foundation
 import AppKit
 
 /// On-disk theme store: ~/Library/Application Support/CodexAura/Themes/<id>/
-final class ThemeLibrary {
-    static let shared = ThemeLibrary()
+public final class ThemeLibrary {
+    public static let shared = ThemeLibrary()
 
-    let rootURL: URL
+    public let rootURL: URL
     private let fm = FileManager.default
 
-    init() {
+    public init(rootURL: URL? = nil) {
         let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        rootURL = support.appendingPathComponent("CodexAura/Themes", isDirectory: true)
+        self.rootURL = rootURL ?? support.appendingPathComponent("CodexAura/Themes", isDirectory: true)
     }
 
-    func listThemes() -> [Theme] {
+    public func listThemes() -> [Theme] {
         guard let entries = try? fm.contentsOfDirectory(
             at: rootURL, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
         ) else { return [] }
@@ -24,7 +24,7 @@ final class ThemeLibrary {
     // MARK: - Import an image as a new theme
 
     @discardableResult
-    func importImage(from sourceURL: URL, name: String? = nil) throws -> Theme {
+    public func importImage(from sourceURL: URL, name: String? = nil) throws -> Theme {
         guard let image = NSImage(contentsOf: sourceURL) else { throw ThemeError.invalidPack }
         // Second-resolution timestamps collide on quick consecutive imports — add a suffix.
         let themeID = "custom-\(Int(Date().timeIntervalSince1970))-\(UUID().uuidString.prefix(6).lowercased())"
@@ -57,7 +57,7 @@ final class ThemeLibrary {
     // MARK: - Import a Dream Skin preset pack directory
 
     @discardableResult
-    func importDreamSkinPreset(from presetDir: URL) throws -> Theme {
+    public func importDreamSkinPreset(from presetDir: URL) throws -> Theme {
         // If the source pack ships no explicit colors, derive them from the image.
         let rawJSON = (try? Data(contentsOf: presetDir.appendingPathComponent("theme.json")))
             .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
@@ -91,7 +91,7 @@ final class ThemeLibrary {
         return try Theme.load(from: dir)
     }
 
-    func importAllDreamSkinPresets() -> Int {
+    public func importAllDreamSkinPresets() -> Int {
         let presetsRoot = fm.homeDirectoryForCurrentUser
             .appendingPathComponent(".codex/codex-dream-skin-studio/presets", isDirectory: true)
         guard let entries = try? fm.contentsOfDirectory(
@@ -115,7 +115,7 @@ final class ThemeLibrary {
 
     // MARK: - Theme pack export / import (.zip)
 
-    func exportPack(_ theme: Theme, to destination: URL) throws {
+    public func exportPack(_ theme: Theme, to destination: URL) throws {
         guard let dir = theme.directory else { throw ThemeError.invalidPack }
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
@@ -126,7 +126,7 @@ final class ThemeLibrary {
     }
 
     @discardableResult
-    func importPack(from zipURL: URL) throws -> Theme {
+    public func importPack(from zipURL: URL) throws -> Theme {
         let temp = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try fm.createDirectory(at: temp, withIntermediateDirectories: true)
         defer { try? fm.removeItem(at: temp) }
@@ -171,12 +171,13 @@ final class ThemeLibrary {
         return try Theme.load(from: dest)
     }
 
-    func delete(_ theme: Theme) throws {
+    public func delete(_ theme: Theme) throws {
+        guard !theme.isBundledPreset else { throw ThemeError.builtInTheme }
         guard let dir = theme.directory else { return }
         try fm.removeItem(at: dir)
     }
 
-    func save(_ theme: Theme, to dir: URL? = nil) throws {
+    public func save(_ theme: Theme, to dir: URL? = nil) throws {
         let target = dir ?? theme.directory ?? rootURL.appendingPathComponent(theme.id, isDirectory: true)
         try fm.createDirectory(at: target, withIntermediateDirectories: true)
         let encoder = JSONEncoder()
@@ -187,7 +188,7 @@ final class ThemeLibrary {
     // MARK: - Built-in gradient presets (generated, no binary assets)
 
     @discardableResult
-    func seedBuiltInPresets() -> Int {
+    public func seedBuiltInPresets() -> Int {
         let presets: [(String, String, NSColor, NSColor)] = [
             ("preset-aura-aurora", "极光", NSColor(calibratedRed: 0.05, green: 0.35, blue: 0.45, alpha: 1),
              NSColor(calibratedRed: 0.35, green: 0.12, blue: 0.55, alpha: 1)),

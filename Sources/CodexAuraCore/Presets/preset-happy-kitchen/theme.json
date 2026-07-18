@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-happy-kitchen",
+  "name": "元气食堂",
+  "image": "background.jpg",
+  "appearance": "light",
+  "colors": {
+    "background": "#fdf6ec",
+    "panel": "#ffffff",
+    "accent": "#e05c4a",
+    "text": "#4a3527",
+    "muted": "#806f5d",
+    "line": "rgba(224,92,74,.22)",
+    "onAccent": "#2a160e"
+  },
+  "dim": 0.06,
+  "blur": 0,
+  "focusX": 0.75,
+  "focusY": 0.48
+}

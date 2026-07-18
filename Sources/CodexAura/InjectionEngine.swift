@@ -1,4 +1,5 @@
 import Foundation
+import CodexAuraCore
 
 /// Long-running loop that keeps the current theme injected into every verified
 /// Codex renderer page on the DevTools port.
