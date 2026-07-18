@@ -40,15 +40,19 @@ public enum ThemePresentation {
               let number = Int(value.dropFirst(), radix: 16)
         else { return 0 }
 
-        let channels = [
-            Double((number >> 16) & 0xff) / 255,
-            Double((number >> 8) & 0xff) / 255,
-            Double(number & 0xff) / 255,
-        ].map { channel in
-            channel <= 0.04045
-                ? channel / 12.92
-                : pow((channel + 0.055) / 1.055, 2.4)
+        let red = Double((number >> 16) & 0xff) / 255.0
+        let green = Double((number >> 8) & 0xff) / 255.0
+        let blue = Double(number & 0xff) / 255.0
+        let linearRed = linearized(red)
+        let linearGreen = linearized(green)
+        let linearBlue = linearized(blue)
+        return 0.2126 * linearRed + 0.7152 * linearGreen + 0.0722 * linearBlue
+    }
+
+    private static func linearized(_ channel: Double) -> Double {
+        if channel <= 0.04045 {
+            return channel / 12.92
         }
-        return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+        return pow((channel + 0.055) / 1.055, 2.4)
     }
 }
