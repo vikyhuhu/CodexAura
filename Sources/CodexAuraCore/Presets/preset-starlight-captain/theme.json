@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
-  "revision": 1,
+  "revision": 3,
   "id": "preset-starlight-captain",
-  "name": "星光小队长",
+  "name": "奥特曼",
   "image": "background.jpg",
-  "appearance": "dark",
+  "appearance": "light",
   "colors": {
-    "background": "#07152f",
-    "panel": "#14284d",
-    "accent": "#46d9ff",
-    "text": "#eaf4ff",
-    "muted": "#8fa5c8",
-    "line": "rgba(70,217,255,.28)",
-    "onAccent": "#07152f"
+    "background": "#e7edf0",
+    "panel": "#f7f4ea",
+    "accent": "#aa4b42",
+    "text": "#283844",
+    "muted": "#687783",
+    "line": "rgba(67,100,119,.16)",
+    "onAccent": "#ffffff"
   },
-  "dim": 0.25,
+  "dim": 0.08,
   "blur": 0,
-  "focusX": 0.75,
+  "focusX": 0.78,
   "focusY": 0.48
 }

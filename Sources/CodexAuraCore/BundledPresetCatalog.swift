@@ -4,6 +4,8 @@ import Foundation
 /// theme library. Resource discovery, validation and idempotency stay behind
 /// this single interface.
 public struct BundledPresetCatalog {
+    private static let retiredPresetIDs = ["preset-millennium-messenger"]
+
     public struct InstallReport: Equatable {
         public let installed: Int
         public let updated: Int
@@ -27,6 +29,7 @@ public struct BundledPresetCatalog {
 
     public func install(into library: ThemeLibrary) throws -> InstallReport {
         try fm.createDirectory(at: library.rootURL, withIntermediateDirectories: true)
+        try removeRetiredPresets(from: library)
         let entries = try fm.contentsOfDirectory(
             at: sourceRoot,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -71,6 +74,18 @@ public struct BundledPresetCatalog {
         }
 
         return InstallReport(installed: installed, updated: updated, unchanged: unchanged)
+    }
+
+    /// Removed catalog entries must also disappear after an app upgrade. Only
+    /// delete copies carrying our marker so an unbundled same-ID theme remains
+    /// user-owned and untouched.
+    private func removeRetiredPresets(from library: ThemeLibrary) throws {
+        for id in Self.retiredPresetIDs {
+            let destination = library.rootURL.appendingPathComponent(id, isDirectory: true)
+            let marker = destination.appendingPathComponent(Theme.bundledMarkerName)
+            guard fm.fileExists(atPath: marker.path) else { continue }
+            try fm.removeItem(at: destination)
+        }
     }
 
     private static func isValidID(_ id: String) -> Bool {

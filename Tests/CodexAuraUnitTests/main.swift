@@ -202,7 +202,29 @@ final class BundledPresetCatalogTests: XCTestCase {
         XCTAssertTrue(installed.isBundledPreset)
     }
 
-    func testBundledResourcesContainFiveValidOptimizedThemePacks() throws {
+    func testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme() throws {
+        let temp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
+        let source = temp.appendingPathComponent("Bundled", isDirectory: true)
+        let destination = temp.appendingPathComponent("Installed", isDirectory: true)
+        let retiredID = "preset-millennium-messenger"
+        defer { try? FileManager.default.removeItem(at: temp) }
+
+        try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
+        try writePreset(id: retiredID, revision: 1, to: destination)
+        let retiredDirectory = destination.appendingPathComponent(retiredID, isDirectory: true)
+        try Data().write(to: retiredDirectory.appendingPathComponent(".codexaura-bundled"))
+
+        let catalog = BundledPresetCatalog(sourceRoot: source)
+        _ = try catalog.install(into: ThemeLibrary(rootURL: destination))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: retiredDirectory.path))
+
+        try writePreset(id: retiredID, revision: 1, to: destination)
+        _ = try catalog.install(into: ThemeLibrary(rootURL: destination))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: retiredDirectory.path))
+    }
+
+    func testBundledResourcesContainFourValidOptimizedThemePacks() throws {
         let destination = FileManager.default.temporaryDirectory
             .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: destination) }
@@ -211,14 +233,14 @@ final class BundledPresetCatalogTests: XCTestCase {
         let report = try BundledPresetCatalog().install(into: library)
         let themes = library.listThemes()
 
-        XCTAssertEqual(report.installed, 5)
+        XCTAssertEqual(report.installed, 4)
         XCTAssertEqual(Set(themes.map(\.id)), [
             "preset-paper-cut-guardian",
             "preset-fortune-dev",
             "preset-starlight-captain",
-            "preset-millennium-messenger",
             "preset-happy-kitchen",
         ])
+        XCTAssertEqual(Set(themes.map(\.name)), ["葫芦娃", "发财程序员", "奥特曼", "元气食堂"])
         for theme in themes {
             let imageURL = try XCTUnwrap(theme.imageURL)
             let thumbnailURL = try XCTUnwrap(theme.thumbnailURL)
@@ -263,7 +285,8 @@ final class BundledPresetCatalogTests: XCTestCase {
         ("testUpgradeReplacesPresetContentButPreservesUserTuning", testUpgradeReplacesPresetContentButPreservesUserTuning),
         ("testDeleteProtectsInstalledPresetButAllowsCustomTheme", testDeleteProtectsInstalledPresetButAllowsCustomTheme),
         ("testInstallClaimsReservedIDWhenExistingThemeIsNotBundled", testInstallClaimsReservedIDWhenExistingThemeIsNotBundled),
-        ("testBundledResourcesContainFiveValidOptimizedThemePacks", testBundledResourcesContainFiveValidOptimizedThemePacks)
+        ("testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme", testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme),
+        ("testBundledResourcesContainFourValidOptimizedThemePacks", testBundledResourcesContainFourValidOptimizedThemePacks)
     ]
 }
 
