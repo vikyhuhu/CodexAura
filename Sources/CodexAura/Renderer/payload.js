@@ -27,7 +27,7 @@
   const root = document.documentElement;
   if (!root) return false; // document-start before <html> exists
 
-  // Live tweaks (dim / blur / bordered) are mirrored to localStorage by the host
+  // Live tweaks (dim / blur / content mask / bordered) are mirrored to localStorage by the host
   // app so reloads replay them. Tweaks are owned by a theme id: stale or foreign
   // entries (previous theme, previous app run) are dropped, never replayed.
   const TWEAKS_KEY = "codexaura:tweaks";
@@ -50,6 +50,7 @@
     "--aura-focus": `${Math.round((__theme.focusX ?? 0.5) * 100)}% ${Math.round((__theme.focusY ?? 0.5) * 100)}%`,
     "--aura-dim": String(__theme.dim ?? 0.35),
     "--aura-blur": `${Number(__theme.blur ?? 0)}px`,
+    "--aura-content-mask": String(__theme.contentMask ?? 1),
     "--aura-bg": colors.background ?? "#101216",
     "--aura-panel": colors.panel ?? "#171a20",
     "--aura-accent": colors.accent ?? "#7aa2f7",

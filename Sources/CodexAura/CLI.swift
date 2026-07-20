@@ -75,7 +75,10 @@ enum CLI {
                     print("\(theme.id)\t\(theme.name)")
                 }
             case "seed":
-                print("生成内置预设: \(ThemeLibrary.shared.seedBuiltInPresets()) 个")
+                let generated = ThemeLibrary.shared.seedBuiltInPresets()
+                let synced = try BundledPresetCatalog().install(into: ThemeLibrary.shared)
+                print("生成基础预设: \(generated) 个")
+                print("同步图片预设: 新增 \(synced.installed) / 更新 \(synced.updated) / 未变化 \(synced.unchanged)")
             case "import-image":
                 guard let path = flags.string("path") else { print("用法: import-image --path <图片> [--name <名>]"); return 64 }
                 let theme = try ThemeLibrary.shared.importImage(
@@ -103,7 +106,7 @@ enum CLI {
       shot --out <路径> [--port N]        截取 Codex 窗口
       restore [--port N]                  还原官方外观
       themes                              列出主题库
-      seed                                生成内置渐变预设
+      seed                                同步全部产品预设
       import-image --path <图> [--name]   导入图片为主题
       import-presets                      导入本机 Dream Skin 预设
     """

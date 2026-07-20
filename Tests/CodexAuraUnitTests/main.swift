@@ -24,6 +24,7 @@ final class ThemeDecodingTests: XCTestCase {
 
         XCTAssertEqual(theme.appearance, .auto)
         XCTAssertEqual(theme.revision, 1)
+        XCTAssertEqual(theme.contentMask, 1)
         XCTAssertNil(theme.colors.onAccent)
     }
 
@@ -141,6 +142,7 @@ final class BundledPresetCatalogTests: XCTestCase {
         var tuned = try XCTUnwrap(library.listThemes().first)
         tuned.dim = 0.62
         tuned.blur = 7
+        tuned.contentMask = 0.35
         try library.save(tuned)
 
         try writePreset(id: "preset-test", revision: 2, to: source)
@@ -152,6 +154,7 @@ final class BundledPresetCatalogTests: XCTestCase {
         XCTAssertEqual(upgraded.revision, 2)
         XCTAssertEqual(upgraded.dim, 0.62)
         XCTAssertEqual(upgraded.blur, 7)
+        XCTAssertEqual(upgraded.contentMask, 0.35)
         XCTAssertEqual(art, Data("background-v2".utf8))
     }
 
@@ -202,7 +205,89 @@ final class BundledPresetCatalogTests: XCTestCase {
         XCTAssertTrue(installed.isBundledPreset)
     }
 
-    func testBundledResourcesContainFiveValidOptimizedThemePacks() throws {
+    func testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme() throws {
+        let temp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
+        let source = temp.appendingPathComponent("Bundled", isDirectory: true)
+        let destination = temp.appendingPathComponent("Installed", isDirectory: true)
+        let retiredIDs = [
+            "preset-millennium-messenger",
+            "preset-fortune-dev",
+            "preset-starlight-captain",
+        ]
+        defer { try? FileManager.default.removeItem(at: temp) }
+
+        try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
+        for id in retiredIDs {
+            try writePreset(id: id, revision: 1, to: destination)
+            try Data().write(to: destination.appendingPathComponent(id, isDirectory: true)
+                .appendingPathComponent(".codexaura-bundled"))
+        }
+
+        let catalog = BundledPresetCatalog(sourceRoot: source)
+        _ = try catalog.install(into: ThemeLibrary(rootURL: destination))
+        for id in retiredIDs {
+            XCTAssertFalse(FileManager.default.fileExists(
+                atPath: destination.appendingPathComponent(id, isDirectory: true).path
+            ))
+        }
+
+        let unmarkedID = "preset-fortune-dev"
+        try writePreset(id: unmarkedID, revision: 1, to: destination)
+        _ = try catalog.install(into: ThemeLibrary(rootURL: destination))
+        XCTAssertTrue(FileManager.default.fileExists(
+            atPath: destination.appendingPathComponent(unmarkedID, isDirectory: true).path
+        ))
+    }
+
+    func testPromotesMatchingLegacyPrototypeAndPreservesTuning() throws {
+        let temp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
+        let source = temp.appendingPathComponent("Bundled", isDirectory: true)
+        let destination = temp.appendingPathComponent("Installed", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temp) }
+
+        try writePreset(id: "preset-blue-muse", revision: 1, to: source)
+        try writePreset(id: "custom-1784285547", revision: 1, to: destination)
+        let library = ThemeLibrary(rootURL: destination)
+        var legacy = try Theme.load(from: destination.appendingPathComponent("custom-1784285547"))
+        legacy.dim = 0.54
+        legacy.blur = 3
+        legacy.contentMask = 0.4
+        try library.save(legacy)
+
+        _ = try BundledPresetCatalog(sourceRoot: source).install(into: library)
+
+        let promoted = try Theme.load(from: destination.appendingPathComponent("preset-blue-muse"))
+        XCTAssertEqual(promoted.dim, 0.54)
+        XCTAssertEqual(promoted.blur, 3)
+        XCTAssertEqual(promoted.contentMask, 0.4)
+        XCTAssertTrue(promoted.isBundledPreset)
+        XCTAssertFalse(FileManager.default.fileExists(
+            atPath: destination.appendingPathComponent("custom-1784285547").path
+        ))
+    }
+
+    func testPreservesLegacyPrototypeWhenArtworkDoesNotMatch() throws {
+        let temp = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
+        let source = temp.appendingPathComponent("Bundled", isDirectory: true)
+        let destination = temp.appendingPathComponent("Installed", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temp) }
+
+        try writePreset(id: "preset-blue-muse", revision: 1, to: source)
+        try writePreset(id: "custom-1784285547", revision: 2, to: destination)
+
+        _ = try BundledPresetCatalog(sourceRoot: source).install(
+            into: ThemeLibrary(rootURL: destination)
+        )
+
+        XCTAssertTrue(FileManager.default.fileExists(
+            atPath: destination.appendingPathComponent("custom-1784285547").path
+        ))
+    }
+
+    func testBundledResourcesContainEightValidOptimizedThemePacks() throws {
         let destination = FileManager.default.temporaryDirectory
             .appendingPathComponent("CodexAuraTests-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: destination) }
@@ -211,13 +296,20 @@ final class BundledPresetCatalogTests: XCTestCase {
         let report = try BundledPresetCatalog().install(into: library)
         let themes = library.listThemes()
 
-        XCTAssertEqual(report.installed, 5)
+        XCTAssertEqual(report.installed, 8)
         XCTAssertEqual(Set(themes.map(\.id)), [
+            "preset-amber-dusk",
+            "preset-blue-muse",
+            "preset-cyber-neon",
+            "preset-forest-mist",
+            "preset-midnight-aurora",
             "preset-paper-cut-guardian",
-            "preset-fortune-dev",
-            "preset-starlight-captain",
-            "preset-millennium-messenger",
             "preset-happy-kitchen",
+            "preset-sakura-dawn",
+        ])
+        XCTAssertEqual(Set(themes.map(\.name)), [
+            "葫芦娃", "元气食堂", "蓝调缪斯", "琥珀黄昏",
+            "赛博霓虹", "森野薄雾", "午夜极光", "樱粉晨曦",
         ])
         for theme in themes {
             let imageURL = try XCTUnwrap(theme.imageURL)
@@ -263,12 +355,39 @@ final class BundledPresetCatalogTests: XCTestCase {
         ("testUpgradeReplacesPresetContentButPreservesUserTuning", testUpgradeReplacesPresetContentButPreservesUserTuning),
         ("testDeleteProtectsInstalledPresetButAllowsCustomTheme", testDeleteProtectsInstalledPresetButAllowsCustomTheme),
         ("testInstallClaimsReservedIDWhenExistingThemeIsNotBundled", testInstallClaimsReservedIDWhenExistingThemeIsNotBundled),
-        ("testBundledResourcesContainFiveValidOptimizedThemePacks", testBundledResourcesContainFiveValidOptimizedThemePacks)
+        ("testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme", testInstallRemovesRetiredBundledPresetButPreservesUnmarkedTheme),
+        ("testPromotesMatchingLegacyPrototypeAndPreservesTuning", testPromotesMatchingLegacyPrototypeAndPreservesTuning),
+        ("testPreservesLegacyPrototypeWhenArtworkDoesNotMatch", testPreservesLegacyPrototypeWhenArtworkDoesNotMatch),
+        ("testBundledResourcesContainEightValidOptimizedThemePacks", testBundledResourcesContainEightValidOptimizedThemePacks)
+    ]
+}
+
+final class RendererStyleTests: XCTestCase {
+    func testContentMaskControlsMainAndSidebarOverlays() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let cssURL = repositoryRoot.appendingPathComponent("Sources/CodexAura/Renderer/skin.css")
+        let css = try String(contentsOf: cssURL, encoding: .utf8)
+
+        XCTAssertTrue(css.contains("opacity: var(--aura-content-mask, 1);"))
+        XCTAssertTrue(css.contains(
+            "background: rgb(var(--aura-bg-rgb) / calc(0.42 * var(--aura-content-mask, 1))) !important;"
+        ))
+        XCTAssertTrue(css.contains(
+            "background: rgb(var(--aura-panel-rgb) / calc(0.68 * var(--aura-content-mask, 1))) !important;"
+        ))
+    }
+
+    static let allTests = [
+        ("testContentMaskControlsMainAndSidebarOverlays", testContentMaskControlsMainAndSidebarOverlays)
     ]
 }
 
 XCTMain([
     testCase(ThemeDecodingTests.allTests),
     testCase(ThemePresentationTests.allTests),
-    testCase(BundledPresetCatalogTests.allTests)
+    testCase(BundledPresetCatalogTests.allTests),
+    testCase(RendererStyleTests.allTests)
 ])

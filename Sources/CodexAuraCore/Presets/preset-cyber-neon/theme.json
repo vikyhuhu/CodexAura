@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-cyber-neon",
+  "name": "赛博霓虹",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#07070d",
+    "panel": "#12101f",
+    "accent": "#16e0ff",
+    "text": "#eafcff",
+    "muted": "#8f93b8",
+    "line": "rgba(22, 224, 255, .26)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}

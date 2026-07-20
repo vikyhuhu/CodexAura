@@ -4,6 +4,15 @@ import Foundation
 /// theme library. Resource discovery, validation and idempotency stay behind
 /// this single interface.
 public struct BundledPresetCatalog {
+    private static let retiredPresetIDs = [
+        "preset-millennium-messenger",
+        "preset-fortune-dev",
+        "preset-starlight-captain",
+    ]
+    private static let legacyPresetAliases = [
+        "custom-1784285547": "preset-blue-muse",
+    ]
+
     public struct InstallReport: Equatable {
         public let installed: Int
         public let updated: Int
@@ -27,6 +36,7 @@ public struct BundledPresetCatalog {
 
     public func install(into library: ThemeLibrary) throws -> InstallReport {
         try fm.createDirectory(at: library.rootURL, withIntermediateDirectories: true)
+        try removeRetiredPresets(from: library)
         let entries = try fm.contentsOfDirectory(
             at: sourceRoot,
             includingPropertiesForKeys: [.isDirectoryKey],
@@ -63,6 +73,7 @@ public struct BundledPresetCatalog {
                 var replacement = try Theme.load(from: staging)
                 replacement.dim = existing.dim
                 replacement.blur = existing.blur
+                replacement.contentMask = existing.contentMask
                 try library.save(replacement, to: staging)
             }
             if existed { try fm.removeItem(at: destination) }
@@ -70,7 +81,44 @@ public struct BundledPresetCatalog {
             if existed { updated += 1 } else { installed += 1 }
         }
 
+        try migrateLegacyPresetAliases(in: library)
+
         return InstallReport(installed: installed, updated: updated, unchanged: unchanged)
+    }
+
+    /// Removed catalog entries must also disappear after an app upgrade. Only
+    /// delete copies carrying our marker so an unbundled same-ID theme remains
+    /// user-owned and untouched.
+    private func removeRetiredPresets(from library: ThemeLibrary) throws {
+        for id in Self.retiredPresetIDs {
+            let destination = library.rootURL.appendingPathComponent(id, isDirectory: true)
+            let marker = destination.appendingPathComponent(Theme.bundledMarkerName)
+            guard fm.fileExists(atPath: marker.path) else { continue }
+            try fm.removeItem(at: destination)
+        }
+    }
+
+    /// Promote a known local prototype to its canonical bundled ID without
+    /// deleting an unrelated user theme that happens to share the legacy ID.
+    /// Exact artwork equality is the safety boundary for the one-time cleanup.
+    private func migrateLegacyPresetAliases(in library: ThemeLibrary) throws {
+        for (legacyID, promotedID) in Self.legacyPresetAliases {
+            let legacyDirectory = library.rootURL.appendingPathComponent(legacyID, isDirectory: true)
+            let promotedDirectory = library.rootURL.appendingPathComponent(promotedID, isDirectory: true)
+            guard let legacy = try? Theme.load(from: legacyDirectory),
+                  var promoted = try? Theme.load(from: promotedDirectory),
+                  promoted.isBundledPreset,
+                  let legacyImageURL = legacy.imageURL,
+                  let promotedImageURL = promoted.imageURL,
+                  try Data(contentsOf: legacyImageURL) == Data(contentsOf: promotedImageURL)
+            else { continue }
+
+            promoted.dim = legacy.dim
+            promoted.blur = legacy.blur
+            promoted.contentMask = legacy.contentMask
+            try library.save(promoted)
+            try fm.removeItem(at: legacyDirectory)
+        }
     }
 
     private static func isValidID(_ id: String) -> Bool {

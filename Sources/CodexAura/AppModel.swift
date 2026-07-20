@@ -23,6 +23,9 @@ final class AppModel: ObservableObject {
     // Live tuning for the active theme (persisted back to theme.json).
     @Published var dim: Double = 0.25 { didSet { liveTweak("--aura-dim", String(dim)) } }
     @Published var blur: Double = 0 { didSet { liveTweak("--aura-blur", "\(blur)px") } }
+    @Published var contentMask: Double = 1 {
+        didSet { liveTweak("--aura-content-mask", String(contentMask)) }
+    }
 
     /// 「边界线」开关：持久化到设置文件，并实时切所有已注入页面。
     @Published var bordered: Bool = AuraSettings.load().bordered {
@@ -127,6 +130,7 @@ final class AppModel: ObservableObject {
             activeThemeID = theme.id
             dim = theme.dim
             blur = theme.blur
+            contentMask = theme.contentMask
             statusLine = "已应用：\(theme.name)（\(injected) 个页面）"
         } catch {
             // The endpoint may have died (Codex quit, port squatted) — refresh so
@@ -252,6 +256,7 @@ final class AppModel: ObservableObject {
               var theme = themes.first(where: { $0.id == id }) else { return }
         theme.dim = dim
         theme.blur = blur
+        theme.contentMask = contentMask
         try? ThemeLibrary.shared.save(theme)
         reloadThemes()
     }

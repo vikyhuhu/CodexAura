@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
-  "revision": 1,
+  "revision": 5,
   "id": "preset-paper-cut-guardian",
-  "name": "剪纸山海守夜人",
+  "name": "葫芦娃",
   "image": "background.jpg",
-  "appearance": "dark",
+  "appearance": "light",
   "colors": {
-    "background": "#10142b",
-    "panel": "#1a1f3d",
-    "accent": "#f0a53a",
-    "text": "#f2ecdf",
-    "muted": "#9aa0c0",
-    "line": "rgba(240,165,58,.26)",
-    "onAccent": "#10142b"
+    "background": "#e8ddc1",
+    "panel": "#f7efdc",
+    "accent": "#c74330",
+    "text": "#2f3429",
+    "muted": "#6e6c59",
+    "line": "rgba(48,79,66,.16)",
+    "onAccent": "#ffffff"
   },
-  "dim": 0.28,
+  "dim": 0.10,
   "blur": 0,
-  "focusX": 0.76,
+  "focusX": 0.78,
   "focusY": 0.48
 }

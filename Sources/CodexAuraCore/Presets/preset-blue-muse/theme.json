@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-blue-muse",
+  "name": "蓝调缪斯",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#15171e",
+    "panel": "#22242f",
+    "accent": "#e49858",
+    "text": "#eceef2",
+    "muted": "#a2a8b0",
+    "line": "rgba(255,255,255,.14)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}

@@ -47,7 +47,7 @@ jobs:
           lipo "$APP/Contents/MacOS/CodexAura" -verify_arch arm64 x86_64
           codesign --verify --deep --strict "$APP"
           PRESET_COUNT="$(find "$APP/Contents/Resources/CodexAura_CodexAuraCore.bundle/Presets" -name theme.json | wc -l | tr -d ' ')"
-          test "$PRESET_COUNT" -eq 5
+          test "$PRESET_COUNT" -eq 8
 
   quality-gate:
     name: quality-gate

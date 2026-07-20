@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-sakura-dawn",
+  "name": "樱粉晨曦",
+  "image": "background.jpg",
+  "appearance": "light",
+  "colors": {
+    "background": "#fdf3f5",
+    "panel": "#ffffff",
+    "accent": "#f0607a",
+    "text": "#3a2a30",
+    "muted": "#9a8288",
+    "line": "rgba(240, 96, 122, .22)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}

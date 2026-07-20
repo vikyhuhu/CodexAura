@@ -18,6 +18,7 @@ public struct Theme: Codable, Identifiable, Hashable {
     public var colors: Colors
     public var dim: Double = 0.25      // readability scrim opacity 0...0.8
     public var blur: Double = 0        // wallpaper blur in px 0...30
+    public var contentMask: Double = 1 // content readability gradient strength 0...1
     public var focusX: Double = 0.5    // background focal point 0...1
     public var focusY: Double = 0.5
 
@@ -46,7 +47,7 @@ public struct Theme: Codable, Identifiable, Hashable {
     var directory: URL?
 
     enum CodingKeys: String, CodingKey {
-        case schemaVersion, revision, id, name, image, appearance, colors, dim, blur, focusX, focusY
+        case schemaVersion, revision, id, name, image, appearance, colors, dim, blur, contentMask, focusX, focusY
     }
 
     /// Decoding-only key for Dream Skin's nested `art` object (not encoded).
@@ -54,7 +55,8 @@ public struct Theme: Codable, Identifiable, Hashable {
 
     public init(schemaVersion: Int = 1, revision: Int = 1, id: String, name: String, image: String,
                 appearance: Appearance = .auto, colors: Colors,
-                dim: Double = 0.25, blur: Double = 0, focusX: Double = 0.5, focusY: Double = 0.5,
+                dim: Double = 0.25, blur: Double = 0, contentMask: Double = 1,
+                focusX: Double = 0.5, focusY: Double = 0.5,
                 directory: URL? = nil) {
         self.schemaVersion = schemaVersion
         self.revision = revision
@@ -65,6 +67,7 @@ public struct Theme: Codable, Identifiable, Hashable {
         self.colors = colors
         self.dim = dim
         self.blur = blur
+        self.contentMask = contentMask
         self.focusX = focusX
         self.focusY = focusY
         self.directory = directory
@@ -114,6 +117,7 @@ public struct Theme: Codable, Identifiable, Hashable {
         colors = try c.decodeIfPresent(Colors.self, forKey: .colors) ?? Theme.fallbackColors
         dim = try c.decodeIfPresent(Double.self, forKey: .dim) ?? 0.25
         blur = try c.decodeIfPresent(Double.self, forKey: .blur) ?? 0
+        contentMask = try c.decodeIfPresent(Double.self, forKey: .contentMask) ?? 1
         if let fx = try c.decodeIfPresent(Double.self, forKey: .focusX),
            let fy = try c.decodeIfPresent(Double.self, forKey: .focusY) {
             focusX = fx; focusY = fy

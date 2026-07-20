@@ -97,6 +97,16 @@ struct MenuContentView: View {
                     if !editing { model.persistTuning() }
                 }
             }
+            HStack {
+                Text("蒙版").font(.caption).frame(width: 34, alignment: .leading)
+                Slider(value: $model.contentMask, in: 0...1) { editing in
+                    if !editing { model.persistTuning() }
+                }
+                Text("\(Int((model.contentMask * 100).rounded()))%")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .frame(width: 34, alignment: .trailing)
+            }
             Toggle("边界线", isOn: $model.bordered)
                 .toggleStyle(.switch)
                 .controlSize(.small)
