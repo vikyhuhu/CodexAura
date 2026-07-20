@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-forest-mist",
+  "name": "森野薄雾",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#0d1a16",
+    "panel": "#14261e",
+    "accent": "#7fd1b9",
+    "text": "#e8f5ee",
+    "muted": "#94b3a4",
+    "line": "rgba(127, 209, 185, .26)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}

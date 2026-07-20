@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-amber-dusk",
+  "name": "琥珀黄昏",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#17110c",
+    "panel": "#241a12",
+    "accent": "#ffb347",
+    "text": "#fff3e6",
+    "muted": "#c4a888",
+    "line": "rgba(255, 179, 71, .26)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}

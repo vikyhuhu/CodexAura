@@ -87,7 +87,7 @@ html.codex-aura aside[class*="left-panel"] {
   /* One continuous painting: same tint as the main area's left edge so the
      sidebar and content read as a single surface. No blur (its edge fringe
      reads as a seam), no border in borderless mode. */
-  background: rgb(var(--aura-bg-rgb) / 0.42) !important;
+  background: rgb(var(--aura-bg-rgb) / calc(0.42 * var(--aura-content-mask, 1))) !important;
   border-right: none !important;
   box-shadow: none !important;
 }
@@ -123,6 +123,7 @@ html.codex-aura main.main-surface::before {
     rgb(var(--aura-bg-rgb) / 0.42) 0%,
     rgb(var(--aura-bg-rgb) / 0.22) 55%,
     rgb(var(--aura-bg-rgb) / 0.06) 100%);
+  opacity: var(--aura-content-mask, 1);
   pointer-events: none;
 }
 
@@ -281,6 +282,6 @@ html.codex-aura.aura-bordered {
 
 html.codex-aura.aura-bordered aside.app-shell-left-panel,
 html.codex-aura.aura-bordered aside[class*="left-panel"] {
-  background: rgb(var(--aura-panel-rgb) / 0.68) !important;
+  background: rgb(var(--aura-panel-rgb) / calc(0.68 * var(--aura-content-mask, 1))) !important;
   border-right: 1px solid var(--aura-line) !important;
 }

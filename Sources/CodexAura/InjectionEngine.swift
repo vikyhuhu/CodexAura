@@ -113,7 +113,7 @@ actor InjectionEngine {
         try await discoverAndInject()
     }
 
-    /// Live-tweak a CSS variable on every injected page (dim / blur / focus) and
+    /// Live-tweak a CSS variable on every injected page (dim / blur / content mask / focus) and
     /// mirror it into localStorage so page reloads replay the same value (the
     /// payload re-reads it — otherwise tweaks silently revert on refresh).
     func setVariable(_ name: String, value: String) async {

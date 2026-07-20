@@ -50,6 +50,7 @@ enum PayloadBuilder {
             "name": theme.name,
             "dim": theme.dim,
             "blur": theme.blur,
+            "contentMask": theme.contentMask,
             "focusX": theme.focusX,
             "focusY": theme.focusY,
             "colorScheme": presentation.colorScheme,

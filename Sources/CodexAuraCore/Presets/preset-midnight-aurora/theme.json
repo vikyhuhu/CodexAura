@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "preset-midnight-aurora",
+  "name": "午夜极光",
+  "image": "background.jpg",
+  "appearance": "dark",
+  "colors": {
+    "background": "#0a0e1a",
+    "panel": "#111a2e",
+    "accent": "#2de1c2",
+    "text": "#eaf4ff",
+    "muted": "#93a6c4",
+    "line": "rgba(45, 225, 194, .26)"
+  },
+  "dim": 0.25,
+  "blur": 0,
+  "contentMask": 1,
+  "focusX": 0.5,
+  "focusY": 0.5
+}
