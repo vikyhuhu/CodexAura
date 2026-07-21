@@ -380,8 +380,25 @@ final class RendererStyleTests: XCTestCase {
         ))
     }
 
+    func testHomeSuggestionGroupUsesNativeVerticalPositionAndCentersContents() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let cssURL = repositoryRoot.appendingPathComponent("Sources/CodexAura/Renderer/skin.css")
+        let css = try String(contentsOf: cssURL, encoding: .utf8)
+
+        XCTAssertFalse(css.contains("transform: translateY(48px);"))
+        XCTAssertTrue(css.contains("justify-content: center !important;"))
+        XCTAssertTrue(css.contains("flex: 0 1 auto !important;"))
+    }
+
     static let allTests = [
-        ("testContentMaskControlsMainAndSidebarOverlays", testContentMaskControlsMainAndSidebarOverlays)
+        ("testContentMaskControlsMainAndSidebarOverlays", testContentMaskControlsMainAndSidebarOverlays),
+        (
+            "testHomeSuggestionGroupUsesNativeVerticalPositionAndCentersContents",
+            testHomeSuggestionGroupUsesNativeVerticalPositionAndCentersContents
+        )
     ]
 }
 
