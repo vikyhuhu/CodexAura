@@ -249,17 +249,19 @@ html.codex-aura main .heading-xl button {
   margin: 0 2px !important;
 }
 
-/* 建议卡：整体下移、文字单行、内容居中、图标坐进半透明圈 */
-html.codex-aura [class*="home-suggestions"] {
-  transform: translateY(48px);
-}
+/* 首页建议：文字单行、内容居中、图标坐进半透明圈。
+   保持 Codex 新版的垂直定位，避免建议图标与 composer 功能栏重叠。 */
 html.codex-aura [class*="home-suggestions"] button {
   white-space: nowrap !important;
+  justify-content: center !important;
 }
 html.codex-aura [class*="home-suggestions"] button > span:first-child,
 html.codex-aura [class*="home-suggestions"] button > span:last-child {
   justify-content: center !important;
   text-align: center !important;
+}
+html.codex-aura [class*="home-suggestions"] button > span:last-child {
+  flex: 0 1 auto !important;
 }
 html.codex-aura [class*="home-suggestions"] button [class*="size-6"]:has(svg) {
   width: 44px !important;
